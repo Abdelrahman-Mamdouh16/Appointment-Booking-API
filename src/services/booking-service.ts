@@ -1,6 +1,7 @@
 import { BookingStatus, Prisma } from '@prisma/client';
 import { AppError } from '../errors/app-error.js';
 import { prisma } from '../lib/prisma.js';
+import { emitSlotBooked, emitSlotReleased } from '../sockets/socket-server.js';
 
 export type CreateBookingInput = {
   slotId: string;
@@ -10,7 +11,7 @@ export type CreateBookingInput = {
 
 export const createBooking = async (input: CreateBookingInput) => {
   try {
-    return await prisma.booking.create({
+    const booking = await prisma.booking.create({
       data: {
         slotId: input.slotId,
         customerName: input.customerName,
@@ -25,6 +26,14 @@ export const createBooking = async (input: CreateBookingInput) => {
         status: true,
       },
     });
+
+    emitSlotBooked({
+      slotId: booking.slotId,
+      bookingId: booking.id,
+      available: false,
+    });
+
+    return booking;
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
@@ -63,11 +72,19 @@ export const cancelBooking = async (bookingId: string) => {
       return booking;
     }
 
-    return await prisma.booking.update({
+    const cancelledBooking = await prisma.booking.update({
       where: { id: bookingId },
       data: { status: BookingStatus.cancelled },
       select: bookingSelect,
     });
+
+    emitSlotReleased({
+      slotId: cancelledBooking.slotId,
+      bookingId: cancelledBooking.id,
+      available: true,
+    });
+
+    return cancelledBooking;
   } catch (error) {
     if (error instanceof AppError) {
       throw error;

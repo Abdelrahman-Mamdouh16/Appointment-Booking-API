@@ -17,24 +17,33 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:setup": "pnpm db:generate && pnpm db:migrate:deploy && pnpm db:seed",
     "postinstall": "prisma generate",
+    "socket:client": "tsx scripts/socket-client.ts",
     "start": "node dist/server.js",
-    "typecheck": "tsc --noEmit"
+    "test": "vitest run",
+    "test:db:setup": "tsx scripts/test-db.ts",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json"
   },
   "dependencies": {
     "@prisma/client": "6.16.2",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
-    "joi": "^18.2.9"
+    "joi": "^18.2.9",
+    "socket.io": "^4.8.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@types/express": "^5.0.3",
     "@types/node": "^24.3.0",
+    "@types/supertest": "^7.2.1",
     "eslint": "^9.35.0",
     "globals": "^16.3.0",
     "prisma": "6.16.2",
+    "socket.io-client": "^4.8.3",
+    "supertest": "^7.3.0",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.42.0"
+    "typescript-eslint": "^8.42.0",
+    "vitest": "^5.0.1"
   }
 }
