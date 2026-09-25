@@ -39,3 +39,44 @@ export const createBooking = async (input: CreateBookingInput) => {
     throw error;
   }
 };
+
+const bookingSelect = {
+  id: true,
+  slotId: true,
+  customerName: true,
+  customerEmail: true,
+  status: true,
+} as const;
+
+export const cancelBooking = async (bookingId: string) => {
+  try {
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      select: bookingSelect,
+    });
+
+    if (!booking) {
+      throw new AppError('BOOKING_NOT_FOUND', 'The requested booking was not found.');
+    }
+
+    if (booking.status === BookingStatus.cancelled) {
+      return booking;
+    }
+
+    return await prisma.booking.update({
+      where: { id: bookingId },
+      data: { status: BookingStatus.cancelled },
+      select: bookingSelect,
+    });
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    }
+
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      throw new AppError('BOOKING_NOT_FOUND', 'The requested booking was not found.');
+    }
+
+    throw error;
+  }
+};
