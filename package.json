@@ -16,13 +16,15 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:setup": "pnpm db:generate && pnpm db:migrate:deploy && pnpm db:seed",
+    "postinstall": "prisma generate",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@prisma/client": "6.16.2",
     "dotenv": "^16.6.1",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "joi": "^18.2.9"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
