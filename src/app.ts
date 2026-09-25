@@ -1,4 +1,5 @@
 import express from 'express';
+import { bookingRoutes } from './routes/booking-routes.js';
 import { errorHandler } from './middlewares/error-handler.js';
 import { slotRoutes } from './routes/slot-routes.js';
 
@@ -12,6 +13,7 @@ app.get('/health', (_request, response) => {
 });
 
 app.use(slotRoutes);
+app.use(bookingRoutes);
 
 app.use(errorHandler);
 
